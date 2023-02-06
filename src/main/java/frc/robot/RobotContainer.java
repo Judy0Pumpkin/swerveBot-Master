@@ -15,22 +15,15 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -58,10 +51,10 @@ public class RobotContainer {
         new RunCommand(
             () ->
                 m_robotDrive.drive(
-                    m_driverController.getLeftY() * 0.4,
-                    m_driverController.getLeftX() * 0.4,
-                    m_driverController.getRightX() * 0.8,
-                    false),
+                    m_driverController.getLeftY()* 0.8,
+                    m_driverController.getLeftX() * 0.8,
+                    m_driverController.getRightX() * 1.5,
+                    true),
             m_robotDrive));
   }
 
@@ -73,12 +66,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
   
-    new JoystickButton(m_driverController, 4).onTrue(new InstantCommand(() -> m_robotDrive.drive( 0,0,0.8,false), m_robotDrive));
-
-    new JoystickButton(m_driverController, 3).onTrue(Commands.run(m_robotDrive::level).until(null));
-   
+  //  new JoystickButton(m_driverController, 3).whileTrue(Commands.runOnce(() -> m_robotDrive.drive( 0,0,0,false), m_robotDrive));
+  //  new JoystickButton(m_driverController, 4).whileTrue(Commands.runOnce(() -> m_robotDrive.drive( 0.35,0,0,false), m_robotDrive));
   
-
+    new JoystickButton(m_driverController, 3).whileTrue(Commands.run(m_robotDrive::level));
   }
 
   /**
@@ -101,14 +92,14 @@ public class RobotContainer {
             
 
     var thetaController =
-      new ProfiledPIDController(0.06, 0, 0, AutoConstants.kThetaControllerConstraints);
+      new ProfiledPIDController(0, 0, 0, AutoConstants.kThetaControllerConstraints);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
 
     var controller = new HolonomicDriveController(
-      new PIDController(0.25, 0, 0), 
-      new PIDController(0.25, 0, 0),
+      new PIDController(0.1, 0, 0), 
+      new PIDController(0.1, 0, 0),
       thetaController);
 
     // Reset odometry to the starting pose of the trajectory.
@@ -129,7 +120,7 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(trajectory.getInitialPose());
 
     //Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, true));
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
 
   }
  }
